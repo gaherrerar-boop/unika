@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-header">
+  <div class="container">
+    <span class="eyebrow">Proceso creativo</span>
+    <h1 class="page-header__title">De la idea al hilo, del hilo a tus manos.</h1>
+    <p class="page-header__lede">
+      Así nace cada Unika: paso a paso, sin atajos, respetando el tiempo del oficio
+      y las manos que tejen.
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container process-grid">
+    {% for step in steps %}
+      <article class="process-card">
+        <span class="process-card__num">{{ step.number }}</span>
+        <h3>{{ step.title }}</h3>
+        <p>{{ step.text }}</p>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section section--dark">
+  <div class="container split">
+    <div>
+      <span class="eyebrow eyebrow--light">Producción consciente</span>
+      <h2 class="section__title section__title--light">Pocas piezas, bien hechas.</h2>
+      <p class="lede">
+        Trabajamos con ediciones cortas, muchas veces numeradas. Lo que entra al
+        taller, sale firmado. No fabricamos en serie ni dejamos piezas a medio terminar.
+      </p>
+    </div>
+    <div>
+      <span class="eyebrow eyebrow--light">Tejedoras</span>
+      <h2 class="section__title section__title--light">Cada pieza, una sola mano.</h2>
+      <p class="lede">
+        En Unika, una sola tejedora hace cada pieza, de principio a fin.
+        Conoce cada nudo, cada giro, cada detalle. Eso explica el alma de lo que recibes.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="cta-block">
+  <div class="container cta-block__inner">
+    <h2>¿Te gustaría visitar el taller?</h2>
+    <p>Escríbenos y coordinamos una visita guiada o un encargo a medida.</p>
+    <a class="btn btn--primary" href="/contacto">Contáctanos</a>
+  </div>
+</section>
+{% endblock %}

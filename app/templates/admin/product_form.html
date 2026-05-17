@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-header">
+  <div class="container">
+    <span class="eyebrow">Administración</span>
+    <h1 class="page-header__title">
+      {{ "Editar producto" if product else "Nuevo producto" }}
+    </h1>
+    <p class="page-header__lede">
+      Completa los datos. Los campos marcados con * son obligatorios.
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <form class="form form--admin" method="post" action="{{ form_action }}">
+      <div class="form__row">
+        <label>
+          Nombre *
+          <input type="text" name="name" required value="{{ product.name if product else '' }}" />
+        </label>
+        <label>
+          Categoría *
+          <select name="category" required>
+            {% set current = product.category if product else '' %}
+            <option value="carteras" {{ 'selected' if current == 'carteras' }}>Carteras</option>
+            <option value="chalecos" {{ 'selected' if current == 'chalecos' }}>Chalecos</option>
+            <option value="accesorios" {{ 'selected' if current == 'accesorios' }}>Accesorios</option>
+          </select>
+        </label>
+      </div>
+
+      <label>
+        Descripción corta *
+        <input type="text" name="short_description" required maxlength="280"
+          value="{{ product.short_description if product else '' }}" />
+      </label>
+
+      <label>
+        Descripción completa *
+        <textarea name="description" rows="5" required>{{ product.description if product else '' }}</textarea>
+      </label>
+
+      <div class="form__row">
+        <label>
+          Materiales *
+          <input type="text" name="materials" required value="{{ product.materials if product else '' }}" />
+        </label>
+        <label>
+          Color *
+          <input type="text" name="color" required value="{{ product.color if product else '' }}" />
+        </label>
+      </div>
+
+      <div class="form__row">
+        <label>
+          Medidas / talla
+          <input type="text" name="dimensions" value="{{ product.dimensions if product else '' }}" />
+        </label>
+        <label>
+          Horas de tejido
+          <input type="number" name="handmade_hours" min="0" value="{{ product.handmade_hours if product else 0 }}" />
+        </label>
+      </div>
+
+      <div class="form__row">
+        <label>
+          Precio (CLP) *
+          <input type="number" step="100" name="price" min="0" required value="{{ product.price if product else 0 }}" />
+        </label>
+        <label>
+          Stock
+          <input type="number" name="stock" min="0" value="{{ product.stock if product else 1 }}" />
+        </label>
+      </div>
+
+      <label>
+        Imagen principal (URL)
+        <input type="text" name="image" value="{{ product.image if product else '/static/img/placeholder.svg' }}" />
+      </label>
+
+      <label>
+        Galería (URLs separadas por coma)
+        <input type="text" name="gallery" value="{{ product.gallery if product else '' }}" />
+      </label>
+
+      <label class="checkbox">
+        <input type="checkbox" name="featured" {{ 'checked' if product and product.featured }} />
+        <span>Mostrar como destacado en el home</span>
+      </label>
+
+      <div class="form__actions">
+        <button class="btn btn--primary" type="submit">
+          {{ "Guardar cambios" if product else "Crear producto" }}
+        </button>
+        <a class="btn btn--ghost" href="/admin">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

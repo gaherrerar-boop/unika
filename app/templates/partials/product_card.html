@@ -1,0 +1,15 @@
+<article class="card">
+  <a class="card__media" href="/producto/{{ product.slug }}">
+    <img src="{{ product.image }}" alt="{{ product.name }}" loading="lazy" />
+    {% if product.featured %}<span class="card__badge">Destacado</span>{% endif %}
+  </a>
+  <div class="card__body">
+    <span class="card__category">{{ product.category | capitalize }}</span>
+    <h3 class="card__title"><a href="/producto/{{ product.slug }}">{{ product.name }}</a></h3>
+    <p class="card__desc">{{ product.short_description }}</p>
+    <div class="card__foot">
+      <span class="card__price">${{ "{:,.0f}".format(product.price).replace(",", ".") }}</span>
+      <a class="card__cta" href="/producto/{{ product.slug }}">Ver pieza →</a>
+    </div>
+  </div>
+</article>

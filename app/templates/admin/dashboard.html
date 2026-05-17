@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-header">
+  <div class="container admin-header">
+    <div>
+      <span class="eyebrow">Administración</span>
+      <h1 class="page-header__title">Tu taller, en una pantalla.</h1>
+    </div>
+    <div class="admin-header__actions">
+      <a class="btn btn--primary" href="/admin/productos/nuevo">+ Nuevo producto</a>
+      <a class="btn btn--ghost" href="/admin/logout">Cerrar sesión</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 class="section__title">Productos ({{ products | length }})</h2>
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Categoría</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Destacado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for product in products %}
+            <tr>
+              <td>
+                <div class="cell-product">
+                  <img src="{{ product.image }}" alt="{{ product.name }}" />
+                  <div>
+                    <strong>{{ product.name }}</strong>
+                    <small>{{ product.slug }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>{{ product.category }}</td>
+              <td>${{ "{:,.0f}".format(product.price).replace(",", ".") }}</td>
+              <td>{{ product.stock }}</td>
+              <td>{{ "Sí" if product.featured else "—" }}</td>
+              <td class="cell-actions">
+                <a class="link" href="/producto/{{ product.slug }}" target="_blank">Ver</a>
+                <a class="link" href="/admin/productos/{{ product.id }}/editar">Editar</a>
+                <form method="post" action="/admin/productos/{{ product.id }}/eliminar"
+                      onsubmit="return confirm('¿Eliminar este producto? Esta acción no se puede deshacer.');">
+                  <button class="link link--danger" type="submit">Eliminar</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section section--soft">
+  <div class="container">
+    <h2 class="section__title">Mensajes recientes ({{ messages | length }})</h2>
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          <article class="message">
+            <header class="message__head">
+              <strong>{{ message.name }}</strong>
+              <span class="badge badge--{{ 'ok' if message.kind == 'pedido' else 'soft' }}">
+                {{ "Pedido" if message.kind == 'pedido' else "Consulta" }}
+              </span>
+              <time>{{ message.created_at.strftime("%d-%m-%Y %H:%M") }}</time>
+            </header>
+            <p class="message__subject">{{ message.subject }}</p>
+            <p class="message__body">{{ message.message }}</p>
+            <footer class="message__foot">
+              <a href="mailto:{{ message.email }}">{{ message.email }}</a>
+              {% if message.phone %}<span>· {{ message.phone }}</span>{% endif %}
+            </footer>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="empty">Aún no hay mensajes. Cuando lleguen, los verás aquí.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

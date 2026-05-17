@@ -1,0 +1,21 @@
+<header class="nav">
+  <div class="nav__inner container">
+    <a class="nav__brand" href="/">
+      <span class="nav__brand-mark">U</span>
+      <span class="nav__brand-name">{{ brand.name }}</span>
+    </a>
+
+    <button class="nav__toggle" type="button" aria-label="Abrir menú" data-nav-toggle>
+      <span></span><span></span><span></span>
+    </button>
+
+    <nav class="nav__links" data-nav-links>
+      <a href="/" class="{{ 'is-active' if page == 'home' }}">Inicio</a>
+      <a href="/catalogo" class="{{ 'is-active' if page == 'catalog' or page == 'product' }}">Catálogo</a>
+      <a href="/hecho-a-mano" class="{{ 'is-active' if page == 'handmade' }}">Hecho a mano</a>
+      <a href="/proceso" class="{{ 'is-active' if page == 'process' }}">Proceso</a>
+      <a href="/galeria" class="{{ 'is-active' if page == 'gallery' }}">Galería</a>
+      <a href="/contacto" class="{{ 'is-active' if page == 'contact' }}">Contacto</a>
+    </nav>
+  </div>
+</header>

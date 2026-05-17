@@ -1,0 +1,36 @@
+<footer class="footer">
+  <div class="container footer__inner">
+    <div class="footer__col">
+      <span class="footer__brand">{{ brand.name }}</span>
+      <p class="footer__tagline">{{ brand.tagline }}</p>
+    </div>
+
+    <div class="footer__col">
+      <h4>Navegar</h4>
+      <a href="/catalogo">Catálogo</a>
+      <a href="/hecho-a-mano">Hecho a mano</a>
+      <a href="/proceso">Proceso</a>
+      <a href="/galeria">Galería</a>
+      <a href="/redes">Redes sociales</a>
+    </div>
+
+    <div class="footer__col">
+      <h4>Contacto</h4>
+      <a href="mailto:{{ brand.email }}">{{ brand.email }}</a>
+      <a href="tel:{{ brand.phone | replace(' ', '') }}">{{ brand.phone }}</a>
+      <a href="/contacto">Pedidos personalizados</a>
+    </div>
+
+    <div class="footer__col">
+      <h4>Síguenos</h4>
+      <a href="{{ brand.instagram }}" rel="noopener" target="_blank">Instagram</a>
+      <a href="{{ brand.facebook }}" rel="noopener" target="_blank">Facebook</a>
+      <a href="{{ brand.tiktok }}" rel="noopener" target="_blank">TikTok</a>
+    </div>
+  </div>
+
+  <div class="footer__bottom container">
+    <small>© {{ brand.name }} — Tejido a mano en Chile. Todos los derechos reservados.</small>
+    <small><a href="/admin">Admin</a></small>
+  </div>
+</footer>

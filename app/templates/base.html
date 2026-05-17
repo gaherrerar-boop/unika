@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f0e6" />
+    <meta name="description" content="Unika — Carteras, chalecos y accesorios tejidos a mano. Boutique artesanal chilena." />
+    <title>{{ title or "Unika — Tejidos a mano" }}</title>
+    <link rel="icon" type="image/svg+xml" href="/static/img/favicon.svg" />
+    <link rel="stylesheet" href="/static/css/styles.css" />
+  </head>
+  <body data-page="{{ page or 'home' }}">
+    {% include "partials/nav.html" %}
+
+    <main class="main">
+      {% block content %}{% endblock %}
+    </main>
+
+    {% include "partials/footer.html" %}
+
+    <script src="/static/js/main.js" defer></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

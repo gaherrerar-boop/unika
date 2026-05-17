@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-header page-header--editorial">
+  <div class="container">
+    <span class="eyebrow">Hecho a mano</span>
+    <h1 class="page-header__title">Lo único, como manifiesto.</h1>
+    <p class="page-header__lede">{{ brand_copy.value_handmade }}</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container editorial">
+    {% for block in blocks %}
+      <article class="editorial__block">
+        <span class="editorial__num">{{ "%02d"|format(loop.index) }}</span>
+        <h2>{{ block.title }}</h2>
+        <p>{{ block.text }}</p>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section section--soft">
+  <div class="container quote">
+    <p class="quote__text">
+      “Tejer es un acto de tiempo. No se puede acelerar sin perder lo que importa.”
+    </p>
+    <span class="quote__author">— Taller Unika</span>
+  </div>
+</section>
+
+<section class="cta-block">
+  <div class="container cta-block__inner">
+    <h2>¿Quieres una pieza única, hecha solo para ti?</h2>
+    <p>Conversemos colores, fibras y medidas. Cada encargo se trabaja con cariño.</p>
+    <a class="btn btn--primary" href="/contacto">{{ brand_copy.cta_contact }}</a>
+  </div>
+</section>
+{% endblock %}

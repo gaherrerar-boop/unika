@@ -1,0 +1,64 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+ENV/
+
+# Distribución / empaquetado
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Variables de entorno
+.env
+.env.local
+.env.*.local
+
+# Bases de datos locales
+*.db
+*.sqlite
+*.sqlite3
+app/database/unika.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Pytest / cobertura
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Subidas de usuarios
+app/static/uploads/
+
+# Vercel
+.vercel
+
+# Archivos fuente que no van al deploy
+FOTOS PRODUCTOS/
+Unika Spa.pdf
+
+# SPA estática antigua (no se usa, vive solo localmente)
+index.html
+assets/
+
+# Claude Code
+.claude/

@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero__bg" aria-hidden="true"></div>
+  <div class="container hero__inner">
+    <span class="eyebrow">Boutique artesanal · Chile</span>
+    <h1 class="hero__title">{{ brand_copy.hero_title }}</h1>
+    <p class="hero__subtitle">{{ brand_copy.hero_subtitle }}</p>
+    <div class="hero__actions">
+      <a class="btn btn--primary" href="/catalogo">{{ brand_copy.hero_cta }}</a>
+      <a class="btn btn--ghost" href="/hecho-a-mano">Conoce nuestra historia</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container section__head">
+    <span class="eyebrow">Manifiesto</span>
+    <h2 class="section__title">{{ brand_copy.intro }}</h2>
+  </div>
+  <div class="container manifesto">
+    {% for line in brand_copy.manifesto %}
+      <div class="manifesto__item">
+        <span class="manifesto__num">{{ "%02d"|format(loop.index) }}</span>
+        <p>{{ line }}</p>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section section--soft">
+  <div class="container section__head section__head--row">
+    <div>
+      <span class="eyebrow">Colección destacada</span>
+      <h2 class="section__title">Piezas únicas, hechas con tiempo</h2>
+    </div>
+    <a class="link-cta" href="/catalogo">{{ brand_copy.cta_catalog }} →</a>
+  </div>
+  <div class="container grid grid--products">
+    {% for product in featured %}
+      {% include "partials/product_card.html" %}
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section">
+  <div class="container values">
+    <article class="value-card">
+      <span class="value-card__icon">✦</span>
+      <h3>Hecho a mano</h3>
+      <p>{{ brand_copy.value_handmade }}</p>
+    </article>
+    <article class="value-card">
+      <span class="value-card__icon">◐</span>
+      <h3>Edición limitada</h3>
+      <p>{{ brand_copy.value_limited }}</p>
+    </article>
+    <article class="value-card">
+      <span class="value-card__icon">❀</span>
+      <h3>A medida</h3>
+      <p>{{ brand_copy.value_custom }}</p>
+    </article>
+  </div>
+</section>
+
+<section class="section section--dark">
+  <div class="container process-preview">
+    <div>
+      <span class="eyebrow eyebrow--light">Cómo lo hacemos</span>
+      <h2 class="section__title section__title--light">Un oficio sin atajos</h2>
+      <p class="lede">
+        Tejer una Unika toma entre 6 y 50 horas según la pieza. No hay molde industrial,
+        no hay máquina que reemplace al pulso humano. Hay tiempo, hilo y manos.
+      </p>
+      <a class="btn btn--light" href="/proceso">Ver proceso completo</a>
+    </div>
+    <ol class="steps">
+      {% for step in process_steps %}
+        <li class="steps__item">
+          <span class="steps__num">{{ step.number }}</span>
+          <h4>{{ step.title }}</h4>
+          <p>{{ step.text }}</p>
+        </li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container section__head">
+    <span class="eyebrow">Recién tejido</span>
+    <h2 class="section__title">Lo último que salió del taller</h2>
+  </div>
+  <div class="container grid grid--products">
+    {% for product in latest %}
+      {% include "partials/product_card.html" %}
+    {% endfor %}
+  </div>
+</section>
+
+<section class="cta-block">
+  <div class="container cta-block__inner">
+    <h2>¿Tienes una pieza en mente?</h2>
+    <p>Hacemos encargos personalizados: color, talla, materiales. Conversemos.</p>
+    <a class="btn btn--primary" href="/contacto">{{ brand_copy.cta_custom }}</a>
+  </div>
+</section>
+{% endblock %}

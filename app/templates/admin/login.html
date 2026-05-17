@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="auth">
+  <div class="auth__card">
+    <span class="eyebrow">Administración</span>
+    <h1>Acceso al taller</h1>
+    <p class="muted">Ingresa con tu usuario y contraseña para gestionar productos y mensajes.</p>
+
+    {% if error %}
+      <div class="alert alert--err">Credenciales incorrectas. Intenta nuevamente.</div>
+    {% endif %}
+
+    <form class="form" method="post" action="/admin/login">
+      <label>
+        Usuario
+        <input type="text" name="user" required autocomplete="username" />
+      </label>
+      <label>
+        Contraseña
+        <input type="password" name="password" required autocomplete="current-password" />
+      </label>
+      <button class="btn btn--primary" type="submit">Entrar</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

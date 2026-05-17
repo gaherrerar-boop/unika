@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-header">
+  <div class="container">
+    <span class="eyebrow">Redes sociales</span>
+    <h1 class="page-header__title">Contenido base para Instagram, Facebook y TikTok.</h1>
+    <p class="page-header__lede">
+      Un banco de ideas listo para publicar: captions, reels, frases de marca y campañas
+      pensadas para venta directa y construcción de comunidad.
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container social">
+    <article class="social__block">
+      <h2>10 captions para productos</h2>
+      <ol>
+        {% for item in social.captions_productos %}<li>{{ item }}</li>{% endfor %}
+      </ol>
+    </article>
+
+    <article class="social__block">
+      <h2>10 ideas de reels</h2>
+      <ol>
+        {% for item in social.ideas_reels %}<li>{{ item }}</li>{% endfor %}
+      </ol>
+    </article>
+
+    <article class="social__block">
+      <h2>10 frases para marca artesanal</h2>
+      <ol>
+        {% for item in social.frases_marca %}<li>{{ item }}</li>{% endfor %}
+      </ol>
+    </article>
+
+    <article class="social__block">
+      <h2>5 publicaciones tipo lanzamiento</h2>
+      <ol>
+        {% for item in social.publicaciones_lanzamiento %}<li>{{ item }}</li>{% endfor %}
+      </ol>
+    </article>
+
+    <article class="social__block">
+      <h2>5 publicaciones sobre proceso de tejido</h2>
+      <ol>
+        {% for item in social.publicaciones_proceso %}<li>{{ item }}</li>{% endfor %}
+      </ol>
+    </article>
+
+    <article class="social__block">
+      <h2>5 publicaciones para venta directa</h2>
+      <ol>
+        {% for item in social.publicaciones_venta_directa %}<li>{{ item }}</li>{% endfor %}
+      </ol>
+    </article>
+  </div>
+</section>
+{% endblock %}

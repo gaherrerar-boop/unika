@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="product">
+  <div class="container product__inner">
+    <div class="product__media">
+      <div class="product__main-image">
+        <img src="{{ product.image }}" alt="{{ product.name }}" id="productMain" />
+      </div>
+      {% if product.gallery_list | length > 1 %}
+        <div class="product__thumbs">
+          {% for img in product.gallery_list %}
+            <button type="button" class="thumb {{ 'is-active' if loop.first }}" data-thumb="{{ img }}">
+              <img src="{{ img }}" alt="Detalle {{ loop.index }} de {{ product.name }}" />
+            </button>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="product__info">
+      <a class="product__back" href="/catalogo">← Volver al catálogo</a>
+      <span class="eyebrow">{{ product.category | capitalize }}</span>
+      <h1 class="product__title">{{ product.name }}</h1>
+      <p class="product__short">{{ product.short_description }}</p>
+
+      <div class="product__price-row">
+        <span class="product__price">${{ "{:,.0f}".format(product.price).replace(",", ".") }}</span>
+        {% if product.stock > 0 %}
+          <span class="badge badge--ok">{{ product.stock }} disponible{{ 's' if product.stock != 1 }}</span>
+        {% else %}
+          <span class="badge badge--off">Agotada — disponible por encargo</span>
+        {% endif %}
+      </div>
+
+      <div class="product__desc">
+        <p>{{ product.description }}</p>
+      </div>
+
+      <dl class="product__meta">
+        <div><dt>Materiales</dt><dd>{{ product.materials }}</dd></div>
+        <div><dt>Color</dt><dd>{{ product.color }}</dd></div>
+        {% if product.dimensions %}<div><dt>Medidas</dt><dd>{{ product.dimensions }}</dd></div>{% endif %}
+        {% if product.handmade_hours %}
+          <div><dt>Horas de tejido</dt><dd>{{ product.handmade_hours }} h aprox.</dd></div>
+        {% endif %}
+      </dl>
+
+      <div class="product__cta">
+        <a class="btn btn--primary" href="/contacto?asunto={{ product.name | urlencode }}&kind=pedido">
+          Reservar esta pieza
+        </a>
+        <a class="btn btn--ghost" href="/contacto?asunto=Pedido%20personalizado&kind=pedido">
+          Pedirla a medida
+        </a>
+      </div>
+
+      <p class="product__note">
+        Despacho desde Santiago. Cada pieza se envía en empaque consciente, lista para regalar o regalarte.
+      </p>
+    </div>
+  </div>
+</section>
+
+{% if related %}
+<section class="section">
+  <div class="container section__head">
+    <span class="eyebrow">También te puede gustar</span>
+    <h2 class="section__title">Otras piezas de la misma familia</h2>
+  </div>
+  <div class="container grid grid--products">
+    {% for product in related %}
+      {% include "partials/product_card.html" %}
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (function () {
+    const main = document.getElementById('productMain');
+    document.querySelectorAll('[data-thumb]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.thumb').forEach((t) => t.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        if (main) main.src = btn.dataset.thumb;
+      });
+    });
+  })();
+</script>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-header">
+  <div class="container">
+    <span class="eyebrow">Contacto</span>
+    <h1 class="page-header__title">Hablemos de tu próxima pieza.</h1>
+    <p class="page-header__lede">
+      Atendemos consultas, reservas y pedidos personalizados. Te respondemos
+      en menos de 48 horas, sin guiones.
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container contact">
+    <aside class="contact__info">
+      <h3>Dónde encontrarnos</h3>
+      <p>Atelier en Santiago, Chile.<br/>Visitas con cita previa.</p>
+
+      <h3>Escríbenos</h3>
+      <a href="mailto:{{ brand.email }}">{{ brand.email }}</a>
+      <a href="tel:{{ brand.phone | replace(' ', '') }}">{{ brand.phone }}</a>
+
+      <h3>Síguenos</h3>
+      <a href="{{ brand.instagram }}" target="_blank" rel="noopener">Instagram</a>
+      <a href="{{ brand.facebook }}" target="_blank" rel="noopener">Facebook</a>
+      <a href="{{ brand.tiktok }}" target="_blank" rel="noopener">TikTok</a>
+    </aside>
+
+    <form class="form" method="post" action="/contacto" novalidate>
+      {% if success %}
+        <div class="alert alert--ok">
+          ¡Gracias! Tu mensaje fue recibido. Te respondemos pronto.
+        </div>
+      {% endif %}
+
+      <div class="form__row">
+        <label>
+          Nombre
+          <input type="text" name="name" required minlength="2" />
+        </label>
+        <label>
+          Email
+          <input type="email" name="email" required />
+        </label>
+      </div>
+
+      <div class="form__row">
+        <label>
+          Teléfono <span class="muted">(opcional)</span>
+          <input type="tel" name="phone" />
+        </label>
+        <label>
+          Tipo de mensaje
+          <select name="kind">
+            <option value="consulta">Consulta general</option>
+            <option value="pedido">Pedido personalizado</option>
+          </select>
+        </label>
+      </div>
+
+      <label>
+        Asunto
+        <input type="text" name="subject" placeholder="Quiero una cartera Mishki en verde..." />
+      </label>
+
+      <label>
+        Mensaje
+        <textarea name="message" rows="6" required minlength="10"
+          placeholder="Cuéntanos en qué piensas: pieza, color, talla, fecha aproximada..."></textarea>
+      </label>
+
+      <button class="btn btn--primary" type="submit">Enviar mensaje</button>
+      <p class="form__note">Al enviar aceptas que te contactemos para responder tu solicitud.</p>
+    </form>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (function () {
+    const params = new URLSearchParams(window.location.search);
+    const subject = params.get('asunto');
+    const kind = params.get('kind');
+    if (subject) {
+      const input = document.querySelector('input[name="subject"]');
+      if (input) input.value = subject;
+    }
+    if (kind) {
+      const select = document.querySelector('select[name="kind"]');
+      if (select) select.value = kind;
+    }
+  })();
+</script>
+{% endblock %}
