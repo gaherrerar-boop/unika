@@ -1289,10 +1289,10 @@ function monthStr(m) { const d=new Date(m+'-01'); return d.toLocaleDateString('e
 /* ══════════════════════════════════════════════════════════════
    AUTENTICACIÓN Y SINCRONIZACIÓN EN LA NUBE
    - Solo existen 2 usuarios de la familia (definidos abajo).
-   - Con Firebase configurado (firebase-config.js) las credenciales se
-     respaldan en Firebase Authentication y los datos se comparten en
-     Firestore en tiempo real entre ambos usuarios.
-   - Sin Firebase, la app funciona en modo local (localStorage).
+   - Con la nube configurada (supabase-config.js) las credenciales se
+     respaldan en Supabase Auth y los datos se comparten en una base
+     de datos en tiempo real entre ambos usuarios.
+   - Sin nube, la app funciona en modo local (localStorage).
 ══════════════════════════════════════════════════════════════ */
 const APP_USERS = { gherrera: 'gabo2026', danita: 'Danita2026' };
 const APP_USER_NAMES = { gherrera: 'gherrera', danita: 'Danita' };
@@ -1313,7 +1313,7 @@ async function doLogin() {
   btn.disabled = true;
   try {
     if (window.FFCloud && FFCloud.enabled) {
-      setLoginStatus('Conectando con Firebase…');
+      setLoginStatus('Conectando con la nube…');
       await FFCloud.login(u, p);
       setLoginStatus('Sincronizando datos…');
       await FFCloud.start();
@@ -1350,9 +1350,9 @@ function updateUserBadge() {
 function setSyncBadge(state) {
   const el = document.getElementById('tb-sync');
   if (!el) return;
-  if (state === 'ok') { el.textContent = '☁️ Sincronizado'; el.style.color = '#aef5ae'; el.title = 'Conectado a Firebase: ambos usuarios ven los mismos datos'; }
-  else if (state === 'error') { el.textContent = '⚠️ Sin conexión'; el.style.color = '#ffd54f'; el.title = 'No se pudo sincronizar con Firestore; los datos se guardan localmente'; }
-  else { el.textContent = '💾 Modo local'; el.style.color = '#ffd54f'; el.title = 'Firebase no configurado: los datos solo se guardan en este dispositivo'; }
+  if (state === 'ok') { el.textContent = '☁️ Sincronizado'; el.style.color = '#aef5ae'; el.title = 'Conectado a la nube: ambos usuarios ven los mismos datos'; }
+  else if (state === 'error') { el.textContent = '⚠️ Sin conexión'; el.style.color = '#ffd54f'; el.title = 'No se pudo sincronizar con la nube; los datos se guardan localmente'; }
+  else { el.textContent = '💾 Modo local'; el.style.color = '#ffd54f'; el.title = 'Nube no configurada: los datos solo se guardan en este dispositivo'; }
 }
 
 function logoutUser() {
@@ -1404,7 +1404,7 @@ function bootLogin() {
         FFCloud.start().then(enterApp, enterApp);
         return;
       }
-      // Hay Firebase pero no sesión activa: pedir login de nuevo
+      // Hay nube pero no sesión activa: pedir login de nuevo
     } else {
       CURRENT_USER = saved;
       enterApp();
@@ -3213,7 +3213,7 @@ function init() {
 }
 
 // Start: la app arranca tras iniciar sesión (ver bootLogin / doLogin).
-// Se espera brevemente a que el módulo de Firebase informe su estado;
+// Se espera brevemente a que el módulo de la nube informe su estado;
 // si no responde (sin red / sin configurar), se muestra el login igual.
 document.addEventListener('DOMContentLoaded', () => {
   window.__loginTimer = setTimeout(bootLogin, 3000);
@@ -3224,115 +3224,108 @@ window.addEventListener('ffcloud-ready', () => {
 });
 </script>
 
-<script src="firebase-config.js"></script>
+<script src="supabase-config.js"></script>
 <script type="module">
 /* ══════════════════════════════════════════════════════════════
-   FIREBASE — Authentication + Firestore (sincronización en vivo)
-   Si firebase-config.js todavía tiene los valores de relleno, la app
-   funciona en modo local y este módulo solo lo notifica.
+   SUPABASE — Autenticación + base de datos compartida en tiempo real
+   La configuración (URL y clave publicable) vive en supabase-config.js.
+   La clave publicable está pensada para ser pública: el acceso a los
+   datos lo protegen las políticas RLS del servidor (solo usuarios
+   autenticados). Si la nube no responde, la app sigue en modo local.
 ══════════════════════════════════════════════════════════════ */
-const cfg = window.FIREBASE_CONFIG || {};
-const configured = !!cfg.apiKey && !/PEGA|AQUI|XXX/i.test(cfg.apiKey);
+const cfg = window.SUPABASE_CONFIG || {};
+const configured = !!(cfg.url && cfg.key);
 const SYNC_KEYS = ['settings','incomes','expenses','catIncome','catExpense','currentList','savedLists','marketPrices','savedMealPlans'];
-const EMAIL_DOMAIN = 'familiafinance-xp.cl';   // dominio interno para mapear usuario → email de Firebase Auth
-const COL = 'familiafinance';                  // colección Firestore con los datos compartidos
+const EMAIL_DOMAIN = 'familiafinance-xp.cl';   // dominio interno para mapear usuario → email
+const TABLE = 'familiafinance';                // tabla compartida en Supabase
+const CLIENT_ID = Math.random().toString(36).slice(2) + Date.now().toString(36);
 
 window.FFCloud = { enabled: configured, user: null };
 const cloudState = document.getElementById('login-cloud-state');
 
 if (!configured) {
-  if (cloudState) cloudState.textContent = '💾 Modo local — Firebase aún no configurado (ver FIREBASE-SETUP.md)';
+  if (cloudState) cloudState.textContent = '💾 Modo local — nube no configurada';
   window.dispatchEvent(new Event('ffcloud-ready'));
 } else {
   try {
-    const [{ initializeApp }, A, F] = await Promise.all([
-      import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js'),
-      import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js'),
-      import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js'),
-    ]);
-    const app = initializeApp(cfg);
-    const auth = A.getAuth(app);
-    const db = F.getFirestore(app);
+    const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+    const sb = createClient(cfg.url, cfg.key);
 
     FFCloud.login = async (username, pass) => {
       const email = `${username}@${EMAIL_DOMAIN}`;
-      try {
-        await A.signInWithEmailAndPassword(auth, email, pass);
-      } catch(e) {
-        if (['auth/user-not-found','auth/invalid-credential','auth/invalid-login-credentials'].includes(e.code)) {
-          // Primer acceso de este usuario: se registra automáticamente en Firebase Auth
-          try {
-            await A.createUserWithEmailAndPassword(auth, email, pass);
-          } catch(e2) {
-            if (e2.code === 'auth/email-already-in-use') throw new Error('La contraseña no coincide con la registrada en Firebase.');
-            throw new Error('Firebase: ' + (e2.code || e2.message));
-          }
-        } else if (e.code === 'auth/operation-not-allowed') {
-          throw new Error('Active el método "Correo electrónico/contraseña" en Firebase Authentication.');
-        } else {
-          throw new Error('Firebase: ' + (e.code || e.message));
+      const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+      if (error) {
+        if (/invalid login credentials/i.test(error.message || '')) {
+          throw new Error('La contraseña no coincide con la registrada en la nube.');
         }
+        throw new Error('Nube: ' + error.message);
       }
-      FFCloud.user = auth.currentUser;
+      FFCloud.user = data.user;
     };
 
-    FFCloud.logout = () => A.signOut(auth);
+    FFCloud.logout = () => sb.auth.signOut();
 
     FFCloud.push = (key, data) => {
-      F.setDoc(F.doc(db, COL, key), {
-        v: JSON.stringify(data),
-        updatedAt: F.serverTimestamp(),
-        by: (auth.currentUser && auth.currentUser.email) || ''
-      })
-      .then(() => { if (window.setSyncBadge) setSyncBadge('ok'); })
-      .catch(err => { console.warn('Firestore push error:', err); if (window.setSyncBadge) setSyncBadge('error'); });
+      sb.from(TABLE).upsert({
+        key,
+        v: data,
+        updated_at: new Date().toISOString(),
+        by: localStorage.getItem('ffxp_user') || '',
+        client_id: CLIENT_ID
+      }).then(({ error }) => {
+        if (error) { console.warn('Supabase push error:', error); if (window.setSyncBadge) setSyncBadge('error'); }
+        else if (window.setSyncBadge) setSyncBadge('ok');
+      });
     };
 
-    FFCloud.reset = () => Promise.all(
-      SYNC_KEYS.map(k => F.deleteDoc(F.doc(db, COL, k)).catch(() => {}))
-    );
+    FFCloud.reset = async () => {
+      await sb.from(TABLE).delete().neq('key', '');
+    };
 
-    let unsub = null;
-    FFCloud.start = () => new Promise(resolve => {
-      if (unsub) { resolve(); return; }
-      let first = true;
-      unsub = F.onSnapshot(F.collection(db, COL), snap => {
-        snap.docChanges().forEach(ch => {
-          if (ch.type === 'removed') return;
-          if (ch.doc.metadata.hasPendingWrites) return; // eco de una escritura propia
-          const d = ch.doc.data();
-          if (!d || typeof d.v !== 'string') return;
-          try { window.applyRemoteKey(ch.doc.id, JSON.parse(d.v)); }
-          catch(e) { console.warn('applyRemoteKey error:', e); }
-        });
-        if (first) {
-          first = false;
-          // Primera sincronización: sube las claves locales que aún no existen en la nube
-          const cloudKeys = new Set(snap.docs.map(d => d.id));
-          SYNC_KEYS.forEach(k => {
-            if (cloudKeys.has(k)) return;
-            const v = localStorage.getItem('ffxp_' + k);
-            if (v !== null) { try { FFCloud.push(k, JSON.parse(v)); } catch(e) {} }
-          });
-          resolve();
-        }
-        if (window.setSyncBadge) setSyncBadge('ok');
-      }, err => {
-        console.warn('Firestore snapshot error:', err);
+    let started = false;
+    FFCloud.start = async () => {
+      if (started) return;
+      started = true;
+      // 1) Carga inicial: la nube manda sobre lo local
+      const { data: rows, error } = await sb.from(TABLE).select('key,v');
+      if (error) {
+        console.warn('Supabase select error:', error);
         if (window.setSyncBadge) setSyncBadge('error');
-        if (first) { first = false; resolve(); }
+        return;
+      }
+      const cloudKeys = new Set();
+      (rows || []).forEach(r => {
+        cloudKeys.add(r.key);
+        try { window.applyRemoteKey(r.key, r.v); } catch(e) { console.warn(e); }
       });
-    });
+      // 2) Sube las claves locales que aún no existen en la nube
+      SYNC_KEYS.forEach(k => {
+        if (cloudKeys.has(k)) return;
+        const v = localStorage.getItem('ffxp_' + k);
+        if (v !== null) { try { FFCloud.push(k, JSON.parse(v)); } catch(e) {} }
+      });
+      // 3) Suscripción en tiempo real a cambios de otros dispositivos
+      sb.channel('familiafinance-sync')
+        .on('postgres_changes', { event: '*', schema: 'public', table: TABLE }, payload => {
+          const row = payload.new;
+          if (!row || !row.key || row.client_id === CLIENT_ID) return; // eco propio
+          try { window.applyRemoteKey(row.key, row.v); } catch(e) { console.warn(e); }
+          if (window.setSyncBadge) setSyncBadge('ok');
+        })
+        .subscribe(status => {
+          if (status === 'SUBSCRIBED' && window.setSyncBadge) setSyncBadge('ok');
+          if (status === 'CHANNEL_ERROR' && window.setSyncBadge) setSyncBadge('error');
+        });
+    };
 
-    // Espera el primer estado de autenticación (restaura sesión previa si existe)
-    await new Promise(res => {
-      const off = A.onAuthStateChanged(auth, u => { FFCloud.user = u; off(); res(); });
-    });
-    if (cloudState) cloudState.textContent = '☁️ Sincronización Firebase activa';
+    // Restaura la sesión previa si existe
+    const { data: { session } } = await sb.auth.getSession();
+    FFCloud.user = session ? session.user : null;
+    if (cloudState) cloudState.textContent = '☁️ Sincronización en la nube activa';
   } catch(e) {
-    console.error('No se pudo iniciar Firebase:', e);
+    console.error('No se pudo iniciar la nube:', e);
     FFCloud.enabled = false;
-    if (cloudState) cloudState.textContent = '⚠️ Error al cargar Firebase — modo local';
+    if (cloudState) cloudState.textContent = '⚠️ Error al conectar con la nube — modo local';
   }
   window.dispatchEvent(new Event('ffcloud-ready'));
 }
