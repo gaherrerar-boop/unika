@@ -56,9 +56,9 @@ app/static/uploads/
 FOTOS PRODUCTOS/
 Unika Spa.pdf
 
-# SPA estática antigua (no se usa, vive solo localmente)
-index.html
-assets/
+# SPA estática antigua (no se usa, vive solo localmente; solo en la raíz)
+/index.html
+/assets/
 
 # Claude Code
 .claude/
